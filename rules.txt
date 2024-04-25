@@ -1,0 +1,29 @@
+Includes
+
+Define taille tableau
+Define position initial joueur 
+
+
+Main :
+	
+	création tableau
+
+	Création espace mémoire tableau
+	Remplissage vierge
+	Ajout du joueur "J"
+
+	PrintGrille()
+	
+
+	MainLoop(!fin)
+		car = getch
+		Erase old position of player from array
+		Check witch keyboard key is pressed
+		SWITCH(car) 
+		...
+		...
+		Add the new character position to array
+		Clear
+		Print new grid
+
+	Free the memory

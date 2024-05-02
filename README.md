@@ -13,15 +13,14 @@
 
 ## Description
 
-Ce projet est écrit en C et se trouve dans le dossier 'base'. Ce projet est l'"aboutissement" du cours de C avancé, par Mr Jouault.
+Ce projet est écrit en C. Il est l'"aboutissement" du cours de C avancé, dispensé par Mr Jouault.
 
 Le jeu s'articule sur la méthode actuellement utiliser en conception de jeu par les grands éditeurs. A savoir, le principe Run, HandleEvent, Update, Draw. Permettant de créer une interface "game" ayant accès à toutes les données possible et ne laissant à la fonction main uniquement la possibilité de lancer le jeu. 
 
 ## Installation
 
 1. Clonez ce dépôt sur votre machine locale.
-2. Naviguez jusqu'au dossier 'base'.
-3. Compilez led fichierd *.c en utilisant : make
+2. Compilez les fichiers *.c en utilisant : make
 
 ## Configuration
 
@@ -56,11 +55,11 @@ Après la compilation, vous pouvez exécuter le programme avec `./Jeu`.
 
 Les commandes sont de type WASD (clavier US), chaque `T` est un trésore et raporte un point, la partie est gagné quand tous les trésors sont trouvés.
 
-Les pièges sont cachés et font perdre un ou plus de point de vie (configurable)
+Les pièges `X` sont cachés et font perdre un ou plus de point de vie (configurable)
 
-Les pirates se déplacent vers vous ! (Pas de perde de points de vie et bug, les pirates éffacent les charactères déjà présents sur la grille de jeu...)
+Les pirates `P` se déplacent vers vous ! (Pas de perde de points de vie et bug, les pirates éffacent les charactères déjà présents sur la grille de jeu...)
 
-Lorsque le joueur n'as plus de vie il perd la partie !
+Lorsque le joueur `J` n'as plus de vie il perd la partie !
 
 ## Contribution
 

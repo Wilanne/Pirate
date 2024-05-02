@@ -54,7 +54,7 @@ void Map_addCharacterOnMap(Map *map, Game *game) {
             trap_pos = (coordinate){rand() % LINES, rand() % COLUMNS};
         } while (Map_getCharacterOnMap(map, trap_pos.x, trap_pos.y) != ' ');
         Trap_set_pos(game->traps[i], trap_pos);
-        map->map_grid[trap_pos.x][trap_pos.y] = 'X';
+        map->map_grid[trap_pos.x][trap_pos.y] = ' ';
     }
 
     for (int i = 0; i < PIRATE; i++) {

@@ -1,10 +1,6 @@
 #ifndef TREASURE_H
 #define TREASURE_H
 
-#include <stdbool.h>
-#include "player.h"
-#include "utils.h"
-
 typedef struct Treasure
 {
     coordinate position;
@@ -17,5 +13,6 @@ Treasure *Treasure_new();
 void Treasure_free(Treasure **Treasure);
 
 coordinate Treasure_get_pos(Treasure *Treasure);
+void Treasure_set_pos(Treasure *Treasure, coordinate pos);
 
 #endif

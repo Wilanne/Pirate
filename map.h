@@ -2,27 +2,33 @@
 #define MAP_H
 
 #include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include "player.h"
+#include "utils.h"
+#include "game.h"
+
+typedef struct Game Game;
+
+typedef struct Map {
+    char **map_grid;
+    int lines;
+    int columns;
+} Map;
 
 // General map functions
-void Map_initaliazeMap(Player *player, uint8_t lines, uint8_t columns);
-void Map_free();
+Map *Map_new(Game *game);
+void Map_free(Map **map);
 
 // Draw the map
-void Map_drawMap();
+void Map_drawMap(Map *map);
 
 // Set and get character on map
-char Map_getCharacterOnMap(int x, int y);
-void Map_setCharacterOnMap(int x, int y, char c);
+void Map_addCharacterOnMap(Map *map, Game *game);
+char Map_getCharacterOnMap(Map *map, int x, int y);
+void Map_setCharacterOnMap(Map *map, int x, int y, char c);
 
 // Check if the position is out of bound
-GAME_STATUS Map_CheckAllConditions(Player *player, char direction);
-bool Map_checkIfInBound(int x, int y/*player ? */);
-bool Map_checkIfOnTreasure(Player *player);
-bool Map_checkIfOnTrap(Player *player);
-
-void printdebug(Player *player);
+void Map_handleMovement(Game *game, char direction);
+bool Map_checkIfInBound(int x, int y);
+bool Map_checkIfOnTreasure(Game *game);
+bool Map_checkIfOnTrap(Game *game);
 
 #endif

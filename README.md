@@ -10,11 +10,11 @@ Ce projet est écrit en C et se trouve dans le dossier 'base'. Il comprend un fi
 
 1. Clonez ce dépôt sur votre machine locale.
 2. Naviguez jusqu'au dossier 'base'.
-3. Compilez le fichier .c en utilisant gcc: `gcc -o outputfile yourfile.c`
+3. Compilez le fichier .c en utilisant : Make
 
 ## Utilisation
 
-Après la compilation, vous pouvez exécuter le programme avec `./outputfile`.
+Après la compilation, vous pouvez exécuter le programme avec `./Jeu`.
 
 ## Contribution
 

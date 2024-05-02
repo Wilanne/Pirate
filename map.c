@@ -3,112 +3,164 @@
 
 #include "map.h"
 #include "player.h"
+#include "pirate.h"
 #include "treasure.h"
 #include "trap.h"
 
-static uint8_t nb_ligne;
-static uint8_t nb_colonne;
-
-char **map_grid;
-
-static Treasure *treasures[TREASURE];
-static Trap *traps[TRAP];
-
-void Map_initaliazeMap(Player *player, uint8_t lines, uint8_t columns) {
-
-    // Set the size of the map
-    nb_ligne = lines;
-    nb_colonne = columns;
-
+Map *Map_new(Game *game) {
     // Memory Allocation
-    map_grid = (char **)malloc(lines * sizeof(char *));
-    for (int i = 0; i < lines; i++) {
-        map_grid[i] = (char *)malloc(columns * sizeof(char));
+    Map *map = calloc(1, sizeof(Map));
+
+    map->lines = LINES;
+    map->columns = COLUMNS;
+
+    // Memory Allocation for the map_grid
+    map->map_grid = (char **)malloc(map->lines * sizeof(char *));
+    for (int i = 0; i < map->lines; i++) {
+        map->map_grid[i] = (char *)malloc(map->columns * sizeof(char));
     }
 
     // Array filling with empty spaces
-    for(int i=0; i< lines; i++)
+    for(int i=0; i< map->lines; i++)
     {
-        for(int j=0; j<columns; j++)
+        for(int j=0; j<map->columns; j++)
         {
-            map_grid[i][j] = ' ';
+            map->map_grid[i][j] = ' ';
         }
     }
-    map_grid[player->position.x][player->position.y] = 'J';
+    // Place a player on the map
+    map->map_grid[game->player->position.x][game->player->position.y] = 'J';
 
-    // Add a treasure
-    for (int i = 0; i < TREASURE; i++) {
-        treasures[i] = Treasure_new(lines,columns);
-        //printf("%p\n", treasure);
-        map_grid[treasures[i]->position.x][treasures[i]->position.y] = 'T';
-    }
-    
-    // Add a trap
-    for (int i = 0; i < TRAP; i++) {
-        traps[i] = Trap_new(lines,columns);
-        //printf("%p\n", treasure);
-        map_grid[traps[i]->position.x][traps[i]->position.y] = ' ';
-    }
+    // Randomly place all the elements on the map
+    Map_addCharacterOnMap(map, game);
+
+    return map;
 }
 
-void Map_free() {
-    for (int i = 0; i < nb_ligne; i++) {
-        free(map_grid[i]);
-    }
-    free(map_grid);
+void Map_addCharacterOnMap(Map *map, Game *game) {
 
     for (int i = 0; i < TREASURE; i++) {
-        Treasure_free(&treasures[i]);
-        treasures[i] = NULL;
+        coordinate treasure_pos;
+        do {
+            treasure_pos = (coordinate){rand() % LINES, rand() % COLUMNS};
+        } while (Map_getCharacterOnMap(map, treasure_pos.x, treasure_pos.y) != ' ');
+        Treasure_set_pos(game->treasures[i], treasure_pos);
+        map->map_grid[treasure_pos.x][treasure_pos.y] = 'T';
     }
 
     for (int i = 0; i < TRAP; i++) {
-        Trap_free(&traps[i]);
-        traps[i] = NULL;
+        coordinate trap_pos;
+        do {
+            trap_pos = (coordinate){rand() % LINES, rand() % COLUMNS};
+        } while (Map_getCharacterOnMap(map, trap_pos.x, trap_pos.y) != ' ');
+        Trap_set_pos(game->traps[i], trap_pos);
+        map->map_grid[trap_pos.x][trap_pos.y] = 'X';
+    }
+
+    for (int i = 0; i < PIRATE; i++) {
+        coordinate pirate_pos;
+        do {
+            pirate_pos = (coordinate){rand() % LINES, rand() % COLUMNS};
+        } while (Map_getCharacterOnMap(map, pirate_pos.x, pirate_pos.y) != ' ');
+        Pirate_set_pos(game->pirates[i], pirate_pos);
+        map->map_grid[pirate_pos.x][pirate_pos.y] = 'P';
     }
 }
 
-void Map_drawMap()
-{
-    for(int j= 0; j<nb_ligne; j++)
+void Map_free(Map **map) {
+    if (map == NULL || *map == NULL) {
+        return; // Nothing to free
+    }
+
+    // Free the memory for map_grid
+    if ((*map)->map_grid != NULL) {
+        for (int i = 0; i < (*map)->lines; ++i) {
+            free((*map)->map_grid[i]);
+        }
+        free((*map)->map_grid);
+    }
+
+    // Free the memory for the Map structure itself
+    free(*map);
+    *map = NULL;
+}
+
+void Map_drawMap(Map *map) {
+    for(int j= 0; j<map->lines; j++)
     {
-        //ligne de delimitation
-        for(int i=0; i<nb_colonne; i++)
+        // Delimitation line
+        for(int i=0; i<map->columns; i++)
         {
             printf("+---");
         }
         printf("+\n");
-        //ligne de contenu
-        for(int i=0; i<nb_colonne; i++)
+
+        // Content
+        for(int i=0; i<map->columns; i++)
         {
             printf("| ");
-            printf("%c",map_grid[j][i]); //contenu
+            printf("%c",map->map_grid[j][i]); // Character
             printf(" ");
         }
         printf("|\n");
     }
-    //ligne de delimitation
-    for(int i=0; i<nb_colonne; i++)
+    // Delimitation line
+    for(int i=0; i<map->columns; i++)
     {
         printf("+---");
     }
     printf("+\n");
 }
 
-char Map_getCharacterOnMap(int x, int y) {
-    return map_grid[x][y];
-}
-void Map_setCharacterOnMap(int x, int y, char c) {
-    map_grid[x][y] = c;
+char Map_getCharacterOnMap(Map *map, int x, int y) {
+    return map->map_grid[x][y];
 }
 
-GAME_STATUS Map_CheckAllConditions(Player *player, char direction) {
-    GAME_STATUS status;
+void Map_setCharacterOnMap(Map *map, int x, int y, char c) {
+    map->map_grid[x][y] = c;
+}
 
-    //coordinate player_pos = Player_get_pos(player);
+bool Map_checkIfInBound(int x, int y) {
+    if (x < 0 || x >= LINES || y < 0 || y >= COLUMNS) {
+        return false;
+    }
+    else {return true;}
+}
 
-    int new_x = player->position.x;
-    int new_y = player->position.y;
+bool Map_checkIfOnTreasure(Game *game) {
+    int ret = 1;
+    for (int i = 0; i < TREASURE; i++) {
+        coordinate treasure_pos = Treasure_get_pos(game->treasures[i]);
+
+        if (game->player->position.x == treasure_pos.x && game->player->position.y == treasure_pos.y) {
+            game->player->score++;
+        }
+        if (game->player->score == TREASURE) {
+            ret = 0;
+        }
+    }
+    return ret;
+}
+
+bool Map_checkIfOnTrap(Game *game) {
+    int ret = 1;
+    for (int i = 0; i < TRAP; i++) {
+        coordinate trap_pos = Trap_get_pos(game->traps[i]);
+
+        if (game->player->position.x == trap_pos.x && game->player->position.y == trap_pos.y) {
+            game->player->health -= game->traps[i]->damage;
+        }
+        if (game->player->health <= 0) {
+            ret = 0;
+        }
+    }
+    return ret;
+}
+
+void Map_handleMovement(Game *game, char direction) {
+
+    int new_x = game->player->position.x;
+    int new_y = game->player->position.y;
 
     switch(direction) {
         case 'w':
@@ -129,75 +181,40 @@ GAME_STATUS Map_CheckAllConditions(Player *player, char direction) {
     }
 
     if (Map_checkIfInBound(new_x, new_y)) {
-        Map_setCharacterOnMap(player->position.x, player->position.y, ' ');
-        player->position.x = new_x;
-        player->position.y = new_y;
-        Map_setCharacterOnMap(player->position.x, player->position.y, 'J');
-        status = CAN_MOVE;
-    } else {status = CANNOT_MOVE;}
+        Map_setCharacterOnMap(game->map, game->player->position.x, game->player->position.y, ' ');
+        game->player->position.x = new_x;
+        game->player->position.y = new_y;
+        Map_setCharacterOnMap(game->map, game->player->position.x, game->player->position.y, 'J');
+        game->status = CAN_MOVE;
+    } else {game->status = CANNOT_MOVE;}
 
-    if (Map_checkIfOnTreasure(player) == 0) {
-        status = GAME_WIN;
+    if (Map_checkIfOnTreasure(game) == 0) {
+        game->status = GAME_WIN;
     }
 
-    if (Map_checkIfOnTrap(player) == 0) {
-        status = GAME_LOOSE;
+    if (Map_checkIfOnTrap(game) == 0) {
+        game->status = GAME_LOOSE;
     }
-    
-    return status;
-}
 
-bool Map_checkIfInBound(int x, int y) {
-    if (x < 0 || x >= nb_ligne || y < 0 || y >= nb_colonne) {
-        return false;
-    }
-    else {return true;}
-}
-
-bool Map_checkIfOnTreasure(Player *player) {
-    int ret = 1;
-    for (int i = 0; i < TREASURE; i++) {
-        coordinate treasure_pos = Treasure_get_pos(treasures[i]);
-
-        if (player->position.x == treasure_pos.x && player->position.y == treasure_pos.y) {
-            player->score++;
+    for (int i = 0; i < PIRATE; i++) {
+        Map_setCharacterOnMap(game->map, game->pirates[i]->position.x, game->pirates[i]->position.y, ' ');
+        if (Pirate_isInLineOfSight(game->pirates[i], game->player->position)) {
+            Pirate_moveTowardPlayer(game->pirates[i], game->player->position);
+        } else {
+            Pirate_moveRandom(game->pirates[i]);
         }
-        if (player->score == TREASURE) {
-            ret = 0;
+        // Check if the new position of the pirate is already occupied by another character
+        if (Map_getCharacterOnMap(game->map, game->pirates[i]->position.x+1, game->pirates[i]->position.y+1) == ' ') {
+            Map_setCharacterOnMap(game->map, game->pirates[i]->position.x, game->pirates[i]->position.y, 'P');
+        } else {
+            // If the new position is occupied, find a new random position for the pirate
+            coordinate new_pos;
+            do {
+                new_pos = (coordinate){rand() % LINES, rand() % COLUMNS};
+            } while (Map_getCharacterOnMap(game->map, new_pos.x, new_pos.y) != ' ');
+            Pirate_set_pos(game->pirates[i], new_pos);
+            Map_setCharacterOnMap(game->map, new_pos.x, new_pos.y, 'P');
         }
     }
-    return ret;
-}
 
-bool Map_checkIfOnTrap(Player *player) {
-    int ret = 1;
-    for (int i = 0; i < TRAP; i++) {
-        coordinate trap_pos = Trap_get_pos(traps[i]);
-
-        if (player->position.x == trap_pos.x && player->position.y == trap_pos.y) {
-            player->health -= traps[i]->damage;
-        }
-        if (player->health <= 0) {
-            ret = 0;
-        }
-    }
-    return ret;
-}
-
-void printdebug(Player *player) {
-    printf("Player position: %d, %d\n", player->position.x, player->position.y);
-    printf("Player health: %d\n", player->health);
-    printf("Player score: %d\n", player->score);
-    
-    for (int i = 0; i < TREASURE; i++) {
-        printf("Treasure position: %d, %d\n", treasures[i]->position.x, treasures[i]->position.y);
-    }
-
-    for (int i = 0; i < TRAP; i++) {
-        printf("Trap position: %d, %d\n", traps[i]->position.x, traps[i]->position.y);
-    }
-
-    // for (int i = 0; i < TRAP; i++) {
-    //     printf("Trap damages: %d\n", traps[i]->damage);
-    // }
 }

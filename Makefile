@@ -3,7 +3,7 @@ EXEC = Jeu
 CC = gcc
 LD = gcc
 
-CCFLAGS = -g -pedantic -pedantic-errors -Wall -fsanitize=address 
+CCFLAGS = -g -pedantic -pedantic-errors -Wall -fsanitize=address
 LDFLAGS = -fsanitize=address
 RM = rm -f
 

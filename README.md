@@ -59,7 +59,7 @@ Les pièges `X` sont cachés et font perdre un ou plus de point de vie (configur
 
 Les pirates `P` se déplacent vers vous ! (Pas de perde de points de vie et bug, les pirates éffacent les charactères déjà présents sur la grille de jeu...)
 
-Lorsque le joueur `J` n'as plus de vie il perd la partie !
+Lorsque le joueur `J` n'as plus de vie il perd la partie ! 
 
 ## Contribution
 
